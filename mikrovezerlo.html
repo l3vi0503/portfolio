@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mikrovezérlő</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #747171;
+            margin: 0;
+            justify-content: center; /* Középre igazítja a tartalmat */
+            overflow: hidden; /* Elkerüli a görgetést */
+        }
+
+        h1 {
+            color: black;
+            background-color: white;
+            padding: 10px;
+            width: 100%;
+            text-align: center;
+            font-size: 36px;
+            margin: 0;
+            box-shadow: 0 4px 2px -2px gray;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            max-width: 800px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .gallery img, .gallery video {
+            width: 75%;
+            height: 50%;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .gallery img:hover, .gallery video:hover {
+            transform: scale(1.1);
+        }
+
+        .image-description {
+            text-align: center;
+            font-size: 16px;
+            margin-top: 5px;
+            color: black;
+        }
+
+        .slideshow-modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            overflow: hidden;
+            justify-content: center;
+            align-items: center;
+            display: flex;
+        }
+
+        .slideshow-modal img, .slideshow-modal video {
+            max-width: 90%;
+            max-height: 80%;
+            margin: auto;
+            display: block;
+            border-radius: 10px;
+        }
+
+        .prev, .next {
+            position: absolute;
+            top: 50%;
+            padding: 16px;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            background-color: rgba(0, 0, 0, 0.6);
+            border: none;
+            border-radius: 50%;
+            user-select: none;
+        }
+
+        .prev {
+            left: 20px;
+        }
+
+        .next {
+            right: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Mikrovezérlő:</h1>
+
+    <div class="gallery">
+        <div>
+            <img src="KEPEK/11/a/mikrovezerlo/mikro1.JPG" alt="Kép 1" onclick="openModal(0)">
+            <p class="image-description">Ezen a képen a mikróvezérlős "Gombvezérelt Számoló Kijelzővel" elnevezett programom látható: </p>
+        </div>
+        <div>
+            <video src="KEPEK/11/a/mikrovezerlo/mikro2.MOV" controls onclick="openModal(1)"></video>
+            <p class="image-description">A videókban pedig a program futtatása látható: </p>
+        </div>
+        <div>
+            <video src="KEPEK/11/a/mikrovezerlo/mikro3.MOV" controls onclick="openModal(2)"></video>
+            
+        </div>
+        
+    </div>
+    <p class="mikrovezerlo-text">Önreflexió: Nagyon jó volt megismerni ezt a tantárgyat, ahol különféle esp32-vel készített akár saját, akár már kitalált programokat elkészíteni </p>
+    
+
+    <!-- Slideshow Modal -->
+    <div id="slideshowModal" class="slideshow-modal">
+        <span class="prev" onclick="changeSlide(-1)">&#10094;</span>
+        <div id="modalContent">
+            <img id="modalImage" src="" alt="Slideshow Image">
+            <video id="modalVideo" src="" controls></video>
+        </div>
+        <span class="next" onclick="changeSlide(1)">&#10095;</span>
+    </div>
+
+    <script>
+        let currentSlideIndex = 0;
+
+        // Array of image and video sources
+        const media = [
+            { type: 'image', src: "KEPEK/11/a/mikrovezerlo/mikro1.JPG" },  // Az első képet itt használjuk
+            { type: 'video', src: "KEPEK/11/a/mikrovezerlo/mikro2.MOV" },  // A második videót itt
+            { type: 'video', src: "KEPEK/11/a/mikrovezerlo/mikro3.MOV" }   // A harmadik videót itt
+        ];
+
+        function openModal(index) {
+            currentSlideIndex = index;
+            showModal();
+        }
+
+        function showModal() {
+            const modal = document.getElementById("slideshowModal");
+            const modalImage = document.getElementById("modalImage");
+            const modalVideo = document.getElementById("modalVideo");
+            const modalContent = document.getElementById("modalContent");
+
+            // Reset the modal content
+            modalImage.style.display = 'none';
+            modalVideo.style.display = 'none';
+            modalVideo.pause();  // Pause the video when changing slides
+
+            // Check the media type (image or video)
+            if (media[currentSlideIndex].type === 'image') {
+                modalImage.src = media[currentSlideIndex].src;
+                modalImage.style.display = 'block';
+            } else if (media[currentSlideIndex].type === 'video') {
+                modalVideo.src = media[currentSlideIndex].src;
+                modalVideo.style.display = 'block';
+            }
+
+            modal.style.display = "flex";
+        }
+
+        function changeSlide(direction) {
+            currentSlideIndex += direction;
+            if (currentSlideIndex < 0) {
+                currentSlideIndex = media.length - 1;
+            } else if (currentSlideIndex >= media.length) {
+                currentSlideIndex = 0;
+            }
+            showModal();
+        }
+
+        // Close modal when clicking outside of the image/video
+        window.onclick = function(event) {
+            const modal = document.getElementById("slideshowModal");
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        };
+    </script>
+
+</body>
+</html>
